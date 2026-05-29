@@ -1,10 +1,8 @@
 # 📊 Customer Behavioral Intelligence
 
-🔗 **[View Live Dashboard →](https://customer-behavioral-intelligence.streamlit.app)**
-
 A end-to-end customer analytics project built on Databricks, analysing 1M+ real e-commerce transactions to uncover customer behaviour patterns, predict churn and generate actionable business insights.
 
-🔗 **[View Live Dashboard](https://customer-behavioral-intelligence.streamlit.app)**
+🔗 **[View Live Dashboard →](https://customer-behavioral-intelligence.streamlit.app)**
 
 ---
 
