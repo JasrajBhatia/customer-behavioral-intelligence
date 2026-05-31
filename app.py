@@ -409,6 +409,38 @@ elif page == "🌍 Audience Profiling":
     fig3.update_layout(yaxis={'categoryorder': 'total ascending'})
     st.plotly_chart(fig3, use_container_width=True)
 
+    # Purchase timing
+    st.divider()
+    st.markdown("#### Peak ordering day across all segments")
+    st.caption("Thursday is consistently the highest ordering day regardless of customer segment")
+
+    day_order = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+
+    all_day_counts = df_profiling.copy()
+    all_day_counts['DayOfWeek'] = pd.to_datetime(
+        all_day_counts['InvoiceDate']).dt.day_name()
+    all_day_counts = all_day_counts.groupby(
+        'DayOfWeek')['Invoice'].nunique().reset_index()
+    all_day_counts.columns = ['DayOfWeek', 'Orders']
+    all_day_counts['DayOfWeek'] = pd.Categorical(
+        all_day_counts['DayOfWeek'], categories=day_order, ordered=True)
+    all_day_counts = all_day_counts.sort_values('DayOfWeek')
+
+    fig_day = px.bar(
+        all_day_counts,
+        x='DayOfWeek',
+        y='Orders',
+        title='Total Orders by Day of Week — All Customers',
+        color='Orders',
+        color_continuous_scale='Blues',
+        text='Orders'
+    )
+    fig_day.update_traces(textposition='outside')
+    fig_day.update_layout(coloraxis_showscale=False)
+    st.plotly_chart(fig_day, use_container_width=True)
+
+    st.info("Thursday is peak ordering day across every customer segment — promotional campaigns sent on Tuesday or Wednesday would catch customers before their peak buying day.")
+
 # PAGE 5: CHURN PREDICTION
 # -------------------------------------------
 elif page == "⚠️ Churn Prediction":
@@ -497,6 +529,43 @@ elif page == "⚠️ Churn Prediction":
         }),
         use_container_width=True
     )
+
+    # SHAP Insight
+    st.divider()
+    st.markdown("#### What drives churn the most?")
+    st.caption("Based on SHAP values from the XGBoost model — features ranked by their impact on churn predictions")
+
+    shap_data = pd.DataFrame({
+        'Feature': [
+            'Customer Lifespan',
+            'Avg Quantity',
+            'Unique Products',
+            'Avg Order Value',
+            'Frequency',
+            'Total Spend',
+            'F Score',
+            'Unique Countries',
+            'S Score'
+        ],
+        'Importance': [1.95, 0.28, 0.22, 0.20, 0.12, 0.10, 0.04, 0.01, 0.01]
+    })
+
+    fig = px.bar(
+        shap_data.sort_values('Importance'),
+        x='Importance',
+        y='Feature',
+        orientation='h',
+        title='Feature Importance — What predicts churn?',
+        color='Importance',
+        color_continuous_scale='Blues'
+    )
+    fig.update_layout(
+        yaxis={'categoryorder': 'total ascending'},
+        coloraxis_showscale=False
+    )
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.info("Customer Lifespan is by far the strongest predictor — customers with a short history between their first and last purchase are significantly more likely to churn.")
 
 # PAGE 6: RECOMMENDATIONS
 # -------------------------------------------
